@@ -31,8 +31,8 @@ lsi = models.LsiModel.load('/tmp/model.lsi')
 lda = models.LdaModel(corpus, id2word=dictionary, num_topics=1)
 corpus_lda = lda[corpus_tfidf]
 lda.print_topic(2)
-lda.save('model.lda')
-corpora.MmCorpus.serialize('lda_corpus.mm', corpus_lda)
+lda.save('/tmp/model.lda')
+corpora.MmCorpus.serialize('/tmp/lda_corpus.mm', corpus_lda)
 for doc in corpus_lda:
     print("ldamodel", doc)
 
