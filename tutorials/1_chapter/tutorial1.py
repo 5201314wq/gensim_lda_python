@@ -39,6 +39,9 @@ new_vec = dictionary.doc2bow(new_doc.lower().split())
 print(new_vec)
 
 corpus = [dictionary.doc2bow(text) for text in texts]
+# serialise as Market Matrix format
 corpora.MmCorpus.serialize('/tmp/deerwester.mm', corpus)
 print(corpus)
+
+
 
