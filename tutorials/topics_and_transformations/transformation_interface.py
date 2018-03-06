@@ -28,7 +28,7 @@ for doc in corpus_lsi: # both bow->tfidf and tfidf->lsi transformations are actu
 lsi.save('/tmp/model.lsi') # same for tfidf, lda, ...
 lsi = models.LsiModel.load('/tmp/model.lsi')
 
-lda = models.LdaModel(corpus, id2word=dictionary, num_topics=1)
+lda = models.LdaModel(corpus, id2word=dictionary, num_topics=3)
 corpus_lda = lda[corpus_tfidf]
 lda.print_topic(2)
 lda.save('/tmp/model.lda')
