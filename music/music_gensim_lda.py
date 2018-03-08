@@ -22,7 +22,7 @@ def process_music_data(data_path, dictionary_path, corpus_path):
     # create dictionary
     dictionary = corpora.Dictionary(texts)
     # dictionary.filter_extremes(no_below=2, no_above=0.5, keep_n=1000000)
-    dictionary.filter_extremes(no_below=3, no_above=0.4)
+    dictionary.filter_extremes(no_below=3, no_above=0.4, keep_n=10000000)
     dictionary.save(dictionary_path)
     print("dictionary", dictionary.token2id)
 
