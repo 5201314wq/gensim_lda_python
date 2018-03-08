@@ -21,10 +21,9 @@ def process_music_data(data_path, dictionary_path, corpus_path):
 
     # create dictionary
     dictionary = corpora.Dictionary(texts)
-    dictionary.filter_extremes(no_below=2, no_above=0.5, keep_n=1000000)
+    # dictionary.filter_extremes(no_below=2, no_above=0.5, keep_n=1000000)
+    dictionary.filter_extremes(no_below=3, no_above=0.4)
     dictionary.save(dictionary_path)
-    print("dfs", dictionary.dfs)
-    raw_input()
     print("dictionary", dictionary.token2id)
 
     # create corpus
