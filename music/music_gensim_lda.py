@@ -21,8 +21,10 @@ def process_music_data(data_path, dictionary_path, corpus_path):
 
     # create dictionary
     dictionary = corpora.Dictionary(texts)
-    dictionary.filter_extremes(no_below=2, no_above=0.5, keep_n=100000)
+    dictionary.filter_extremes(no_below=2, no_above=0.5, keep_n=1000000)
     dictionary.save(dictionary_path)
+    print("dfs", dictionary.dfs)
+    raw_input()
     print("dictionary", dictionary.token2id)
 
     # create corpus
@@ -30,8 +32,20 @@ def process_music_data(data_path, dictionary_path, corpus_path):
     corpora.MmCorpus.serialize(corpus_path, corpus)
     print("len_corpus", len(corpus))
 
-def process_nytimes_data(data_path, dictionary_path, corpus_path):
-    pass
+# load vocab from vocab_file
+def load_vocab_file(vocab_path):
+    vocab_list = []
+    for word in open(vocab_path):
+        vocab_list.append(word.rstrip())
+
+def process_nytimes_data(data_path, vocab_path, dictionary_path, corpus_path):
+    texts = []
+    # load vocab file
+    vocab = load_vocab_file(vocab_path)
+
+    # specify word_id to word
+    # 每次要用的时候读取进内存，但是每次打开文件是不是消耗更大
+    # make file into the format of [[],[]]
 
 
 def train_lda_model(dictionary_path, corpus_path, topic):
@@ -46,7 +60,8 @@ def train_lda_model(dictionary_path, corpus_path, topic):
     corpora.MmCorpus.serialize('/tmp/tfidf_corpus.mm', tfidf_corpus)
 
     # create a lda model
-    lda = models.LdaModel(corpus=tfidf_corpus, id2word=dictionary, num_topics=topic, iterations=100)
+    lda = models.LdaModel(corpus=tfidf_corpus, id2word=dictionary, num_topics=topic,
+                          alpha=0.5, eta=0.5, iterations=200)
     lda_corpus = lda[tfidf_corpus]
     lda.save('/tmp/model.lda')
     corpora.MmCorpus.serialize('/tmp/lda_corpus.mm', lda_corpus)
@@ -62,6 +77,10 @@ if __name__ == '__main__':
                         help="The path of dataset",
                         default='./all.txt',
                         required=False)
+    parser.add_argument('--vocab_path', '-vo',
+                        help="The path of vocab set,only used in nytimes processinh",
+                        default='./all.txt',
+                        required=False)
     parser.add_argument('--dictionary_path', '-di',
                         help="The path of dictionary",
                         default='/tmp/music_dict.dict',
@@ -72,7 +91,7 @@ if __name__ == '__main__':
                         required=False)
     parser.add_argument('--topic', '-t',
                         help="The path of topic",
-                        default=200,
+                        default=300,
                         required=False)
     parser.add_argument('--verbose', '-v',
                         help="Be verbose -- debug logging level",
