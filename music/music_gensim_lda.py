@@ -22,7 +22,7 @@ def process_music_data(data_path, dictionary_path, corpus_path):
     # create dictionary
     dictionary = corpora.Dictionary(texts)
     # dictionary.filter_extremes(no_below=2, no_above=0.5, keep_n=1000000)
-    dictionary.filter_extremes(no_below=3, no_above=0.4, keep_n=10000000)
+    # dictionary.filter_extremes(no_below=3, no_above=0.4, keep_n=10000000)
     dictionary.save(dictionary_path)
     print("dictionary", dictionary.token2id)
 
@@ -42,9 +42,13 @@ def process_nytimes_data(data_path, vocab_path, dictionary_path, corpus_path):
     # load vocab file
     vocab = load_vocab_file(vocab_path)
 
-    # specify word_id to word
-    # 每次要用的时候读取进内存，但是每次打开文件是不是消耗更大
-    # make file into the format of [[],[]]
+    for line in open(data_path).readline()[3:]:
+        print("line",line)
+        raw_input()
+        # specify word_id to word
+        line = line.rstrip()
+
+        # make file into the format of [[],[]]
 
 
 def train_lda_model(dictionary_path, corpus_path, topic):
@@ -59,8 +63,7 @@ def train_lda_model(dictionary_path, corpus_path, topic):
     corpora.MmCorpus.serialize('/tmp/tfidf_corpus.mm', tfidf_corpus)
 
     # create a lda model
-    lda = models.LdaModel(corpus=tfidf_corpus, id2word=dictionary, num_topics=topic,
-                          alpha=0.5, eta=0.5, iterations=200)
+    lda = models.LdaModel(corpus=tfidf_corpus, id2word=dictionary, num_topics=topic, iterations=200)
     lda_corpus = lda[tfidf_corpus]
     lda.save('/tmp/model.lda')
     corpora.MmCorpus.serialize('/tmp/lda_corpus.mm', lda_corpus)
@@ -72,13 +75,17 @@ if __name__ == '__main__':
     # Argument parsing
     parser = argparse.ArgumentParser(description="Simple LDA using gensim")
 
+    parser.add_argument('--data_choose', '-da_c',
+                        help="The chose of dataset's process[nytimes or music]",
+                        default='music',
+                        required=False)
     parser.add_argument('--data_path', '-da',
                         help="The path of dataset",
                         default='./all.txt',
                         required=False)
     parser.add_argument('--vocab_path', '-vo',
-                        help="The path of vocab set,only used in nytimes processinh",
-                        default='./all.txt',
+                        help="The path of vocab set,only used in nytimes processing",
+                        default='./vocab.nytimes.txt',
                         required=False)
     parser.add_argument('--dictionary_path', '-di',
                         help="The path of dictionary",
@@ -106,5 +113,11 @@ if __name__ == '__main__':
     logging.info('Initializing...')
 
     # if os.path.isfile(args.dictionary_path) is False or os.path.isfile(args.corpus_path) is False:
-    process_music_data(args.data_path, args.dictionary_path, args.corpus_path)
+    if args.data_choose == 'nytimes':
+        process_nytimes_data(args.data_path, args.vocab_path, args.dictionary_path, args.corpus_path)
+    elif args.data_choose == 'music':
+        process_music_data(args.data_path, args.dictionary_path, args.corpus_path)
+    else:
+        print("you should choose a existed dataset")
+        exit(0)
     train_lda_model(args.dictionary_path, args.corpus_path, args.topic)
