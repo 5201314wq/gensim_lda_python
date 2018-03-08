@@ -86,12 +86,12 @@ def train_lda_model(dictionary_path, corpus_path, topic):
     corpora.MmCorpus.serialize('/tmp/tfidf_corpus.mm', tfidf_corpus)
 
     # create a lda model
-    lda = models.LdaModel(corpus=tfidf_corpus, id2word=dictionary, num_topics=topic, iterations=200)
+    lda = models.LdaModel(corpus=tfidf_corpus, id2word=dictionary, num_topics=topic, iterations=1000)
     lda_corpus = lda[tfidf_corpus]
     lda.save('/tmp/model.lda')
     corpora.MmCorpus.serialize('/tmp/lda_corpus.mm', lda_corpus)
     print('LDA Topics:')
-    print(lda.print_topics(topic))
+    print(json.dumps(lda.print_topics(topic), encoding="UTF-8", ensure_ascii=False))
 
 
 if __name__ == '__main__':
@@ -120,7 +120,7 @@ if __name__ == '__main__':
                         required=False)
     parser.add_argument('--topic', '-t',
                         help="The path of topic",
-                        default=300,
+                        default=250,
                         required=False)
     parser.add_argument('--verbose', '-v',
                         help="Be verbose -- debug logging level",
