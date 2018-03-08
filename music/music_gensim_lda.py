@@ -16,20 +16,43 @@ import json
 from gensim import corpora, models, similarities
 
 def process_music_data(data_path, dictionary_path, corpus_path):
-    texts = [[word.encode('utf-8') for word in json.loads(line)['comment_seg']]
-             for line in open(data_path) if json.loads(line)['comment_seg'] is not ""]
+    # texts = [[word.encode('utf-8') for word in json.loads(line)['comment_seg']]
+    #          for line in open(data_path)]
+    texts = []
+    for line in open(data_path):
+        word_list = []
+        for word in json.loads(line)['comment_seg']:
+            word = word.encode('utf-8')
+            if len(word) == 3 or word == "":
+                continue
+            word_list.append(word)
+        texts.append(word_list)
 
+    print("texts", json.dumps(texts, encoding="UTF-8", ensure_ascii=False))
+    print("texts")
+    raw_input()
     # create dictionary
     dictionary = corpora.Dictionary(texts)
     # dictionary.filter_extremes(no_below=2, no_above=0.5, keep_n=1000000)
     # dictionary.filter_extremes(no_below=3, no_above=0.4, keep_n=10000000)
     dictionary.save(dictionary_path)
-    print("dictionary", dictionary.token2id)
-
+    print("dictionary", json.dumps(dictionary.token2id, encoding="UTF-8", ensure_ascii=False))
+    print("dictionary")
+    raw_input()
     # create corpus
-    corpus = [dictionary.doc2bow(text) for text in texts]
+    corpus = []
+    for text in texts:
+        if text == []:
+            continue
+        text = dictionary.doc2bow(text)
+        corpus.append(text)
+    # corpus = [dictionary.doc2bow(text) for text in texts]
+    print("corpus", json.dumps(corpus, encoding="UTF-8", ensure_ascii=False))
+    print("corpus")
+    raw_input()
     corpora.MmCorpus.serialize(corpus_path, corpus)
     print("len_corpus", len(corpus))
+    raw_input()
 
 # load vocab from vocab_file
 def load_vocab_file(vocab_path):
